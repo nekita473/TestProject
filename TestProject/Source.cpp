@@ -25,68 +25,57 @@ vector<double> ema(vector<double> close, double n) {
 	return ema_values;
 }
 
-int main()
-{
-	setlocale(LC_ALL, "RUSSIAN");//Чтобы русский текст поддерживался
+struct vector3d {
+	vector3d() {
+	}
+	vector<double> firstvector;
+	vector<double> secondvector;
+	vector<double> thirdvector;
+};
 
-	//Создаем файловый поток и связываем его с файлом
-	ifstream file("Ea_Nasdaq_Full.txt");
-
-	if (file.is_open())//Если открытие файла прошло успешно
+vector3d read_file(string filename) {
+	setlocale(LC_ALL, "RUSSIAN");
+	ifstream file(filename);
+	vector<double> close;
+	vector<double> high;
+	vector<double> low;
+	if (file.is_open())
 	{
 		cout << "Файл открыт." << endl;
 
-		string line;//Строчка текста
+		string line;
 
-		//Будем считывать информацию построчно до тех пор,
-		//пока не закончится файл
-
-		vector<double> close;
-		vector<double> high;
-		vector<double> low;
-
-		int i = 1;
 		while (getline(file, line))
 		{
-			if (i == 0) {
-				cout << line << endl;//Можно посмотреть, что в строчке считалось
-				i++;
-			}
-
-			//Теперь в line хранится содержимое строчки из файла.
-			//Будем её разбирать на составные части.
-
-			//В нашем файле идут две строчки, а потом два числа
 			double close_now, high_now, low_now;
-
-			//Создадим поток для считывания данных из строчки
 			istringstream iss(line);
 
-			//Теперь через стандартный оператор >> считаем данные
-			//Программа сама поймет что в качестве разделителя надо
-			//использовать знак табуляции \t
-
-			//За раз всё считаем
 			iss >> close_now >> high_now >> low_now;
-
-			//Выведем наши данные
-			//cout << "Данные из строчки:" << endl;
-			//cout << "\tClose: " << close << endl;
-			//cout << "\tHigh: " << high << endl;
-			//cout << "\tLow: " << low << endl;
 
 			close.push_back(close_now);
 			high.push_back(high_now);
 			low.push_back(low_now);
 		}
-		vector<double> ema_values_final = ema(close, 9);
-		cout << ema_values_final[2514] << endl;
 	}
 	else
 	{
 		cout << "Не удалось открыть файл." << endl;
 	}
+	vector3d res;
+	res.firstvector = close;
+	res.secondvector = high;
+	res.thirdvector = low;
 
+	return res;
+}
+
+int main()
+{
+	vector<double> close, high, low;
+	vector3d res = read_file("Ea_Nasdaq_Full.txt");
+	close = res.firstvector;
+	vector<double> ema_values_final = ema(close, 9);
+	cout << ema_values_final[2514] << endl;
 	system("pause");
 	return 0;
 }
